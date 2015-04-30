@@ -39,7 +39,7 @@ public class ExampleTest {
     }
 
     public static class Address {
-        public Address(Long id, String line1, String line2, String postcode){
+        public Address(Long id, String line1, String line2, String postcode) {
             // ...
         }
 
