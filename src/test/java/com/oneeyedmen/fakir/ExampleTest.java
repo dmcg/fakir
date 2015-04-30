@@ -5,15 +5,24 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("UnusedDeclaration")
-public class FakerExampleTest {
+public class ExampleTest {
 
+    /*
+     * Fakir - The Ascetic Wonder-Worker
+     *
+     * Fake difficult to build objects, defaulting property values and
+     * allowing overrides.
+     *
+     * We've all got classes like this, coupled for good reasons, really
+     * hard to build.
+     */
     public static class Customer {
         private final Long id;
         private final String firstName, lastName;
@@ -82,20 +91,25 @@ public class FakerExampleTest {
     public abstract class Product {
         public Product(Long id, String description, Object ... andSoOnAndSoOn) {}
     }
-    
-    @Test public void string_properties_return_their_name() {
+
+    @Test public void fakir_can_build_you_a_customer_in_one_line() {
+        Customer customer = Faker.fakeA(Customer.class);
+        assertTrue(customer instanceof Customer);
+    }
+
+    @Test public void it_fakes_string_properties_to_return_their_name() {
         Customer customer = Faker.fakeA(Customer.class);
         assertEquals("firstName", customer.getFirstName());
         assertEquals("lastName", customer.getLastName());
     }
 
-    @Test public void primitive_properties_have_defaults() {
+    @Test public void primitive_properties_have_defaults_too() {
         Customer customer = Faker.fakeA(Customer.class);
         assertEquals(42, customer.age());
         assertEquals(Long.valueOf(54), customer.id());
     }
 
-    @Test public void override_properties_with_fields() {
+    @Test public void you_can_override_properties_with_fields() {
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
             int age = 24;
@@ -116,7 +130,7 @@ public class FakerExampleTest {
         assertEquals("line1", customer.getOrders().get(1).getShippedTo().getLine1());
     }
 
-    @Test public void operations_are_faked_with_methods() {
+    @Test public void you_can_fake_operations_with_methods() {
         Customer customer = new Faker<Customer>() {
             void printOn(PrintStream s) {
                 s.println("kumquat");
