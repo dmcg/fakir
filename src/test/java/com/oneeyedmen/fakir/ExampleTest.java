@@ -19,10 +19,11 @@ public class ExampleTest {
      *
      * Fake difficult to build objects, defaulting property values and
      * allowing overrides.
-     *
-     * We've all got classes like this, coupled for good reasons, really
-     * hard to build.
      */
+
+    // We've all got classes like this, coupled for good reasons, really
+    // hard to build.
+
     public static class Customer {
         private final Long id;
         private final String firstName, lastName;
@@ -91,6 +92,8 @@ public class ExampleTest {
     public abstract class Product {
         public Product(Long id, String description, Object ... andSoOnAndSoOn) {}
     }
+
+    // Fakir to the rescue!
 
     @Test public void fakir_can_build_you_a_customer_in_one_line() {
         Customer customer = Faker.fakeA(Customer.class);
