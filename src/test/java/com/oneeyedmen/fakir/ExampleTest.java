@@ -25,66 +25,44 @@ public class ExampleTest {
     // hard to build.
 
     public static class Customer {
-        private final Long id;
-        private final String firstName, lastName;
-        private final Date dob;
-        private final Address address;
-        private final List<Order> orders;
-
         public Customer(Long id, String firstName, String lastName, Date dob, Address address, List<Order> orders) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.dob = dob;
-            this.address = address;
-            this.orders = orders;
+            //
         }
 
-        public Long id() { return id; }
-        public String getFirstName() { return firstName; }
-        public String getLastName() { return lastName; }
-        public int age() { return -1; /* some calculation here */ }
-        public Address getAddress() { return address; }
-        public List<Order> getOrders() { return orders; }
+        public Long id() { return something(); }
+        public String getFirstName() { return something(); }
+        public String getLastName() { return something(); }
+        public int age() { return something(); }
+        public Address getAddress() { return something(); }
+        public List<Order> getOrders() { return something(); }
         public void printOn(PrintStream s) { s.println("Hello"); }
     }
 
     public static class Address {
-        private final Long id;
-
         public Address(Long id, String line1, String line2, String postcode){
-            this.id = id;
             // ...
         }
 
-        public Long id() { return id; }
-        public String getLine1() { return null; }
-        public String getLine2() { return null; }
-        public String getPostcode() { return null; }
+        public Long id() { return something(); }
+        public String getLine1() { return something(); }
+        public String getLine2() { return something(); }
+        public String getPostcode() { return something(); }
     }
 
     public static class Order {
-        private final Long id;
-        private final Customer customer;
-        private final Address shippedTo;
-        private final BigDecimal shippingCost;
-
         public Order(Long id, Customer customer, Address shippedTo, BigDecimal shippingCost, List<OrderItem> items) {
-            this.id = id;
-            this.customer = customer;
-            this.shippedTo = shippedTo;
-            this.shippingCost = shippingCost;
             // ...
         }
 
-        public Long id() { return id; }
-        public Customer getCustomer() { return customer; }
-        public Address getShippedTo() { return shippedTo; }
-        public BigDecimal getShippingCost() { return shippingCost; }
+        public Long id() { return something(); }
+        public Customer getCustomer() { return something(); }
+        public Address getShippedTo() { return something(); }
+        public BigDecimal getShippingCost() { return something(); }
     }
 
     public static class OrderItem {
         public OrderItem(Long id, Order order, Product product, BigDecimal quantity, BigDecimal net, BigDecimal gross, String notes) {
+            //...
         }
         //...
     }
@@ -92,6 +70,8 @@ public class ExampleTest {
     public abstract class Product {
         public Product(Long id, String description, Object ... andSoOnAndSoOn) {}
     }
+
+    // To build a Customer, you need an Address, some Orders, some OrderItems, some Products...
 
     // Fakir to the rescue!
 
@@ -144,4 +124,10 @@ public class ExampleTest {
         customer.printOn(new PrintStream(os));
         assertEquals("kumquat\n", os.toString());
     }
+
+
+    private static <T> T something() {
+        return null;
+    }
+
 }
