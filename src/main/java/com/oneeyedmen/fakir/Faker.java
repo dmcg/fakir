@@ -17,19 +17,26 @@ public class Faker<T> {
 
     @SuppressWarnings("unchecked")
     private final Class<T> type;
+    private final Factory factory;
 
-    public Faker(Class<T> type) {
+
+    public static <T> T fakeA(Class<T> type) {
+        return fakeA(type, DefaultFactory.INSTANCE);
+    }
+
+    public static <T> T fakeA(Class<T> type, Factory factory) {
+        return new Faker<T>(type, factory).get();
+    }
+
+    protected Faker(Class<T> type, Factory factory) {
+        this.factory = factory;
         //noinspection unchecked
         this.type = type != null ? type :
                 (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
-    public static <T> T fakeA(Class<T> type) {
-        return new Faker<T>(type).get();
-    }
-
     protected Faker() {
-        this(null);
+        this(null, DefaultFactory.INSTANCE);
     }
 
     @SuppressWarnings("unchecked")
@@ -37,9 +44,11 @@ public class Faker<T> {
         return IMPOSTERISER.imposterise(
                 new MyProxiedObjectIdentity(
                         new MethodAccess(this,
-                                new FieldAccess(this, new FakeAccess()))),
+                                new FieldAccess(this, new FakeAccess(factory)))),
                 type);
     }
+
+
 
 
     private class MyProxiedObjectIdentity extends ProxiedObjectIdentity{
