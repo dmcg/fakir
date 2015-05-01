@@ -1,3 +1,5 @@
+```java
+
     /*
      * Fakir - The Ascetic Wonder-Worker
      *
@@ -108,3 +110,39 @@
         customer.printOn(new PrintStream(os));
         assertEquals("kumquat\n", os.toString());
     }
+
+    @Test public void you_can_install_your_own_factory() {
+        DefaultFactory factory = new DefaultFactory() {
+            public Object createA(Type type) {
+                if (type == BigDecimal.class)
+                    return new BigDecimal("99.99");
+                return super.createA(type);
+            }
+
+            protected List createList(Class<?> genericType) {
+                return new FakeList(1, genericType, this);
+            }
+        };
+
+        Customer customer = Faker.fakeA(Customer.class, factory);
+        assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
+        assertEquals(1, customer.getOrders().size());
+    }
+
+    @Test public void and_of_course_combine_that_with_overrides() {
+        DefaultFactory factory = new DefaultFactory() {
+            public Object createA(Type type) {
+                if (type == BigDecimal.class)
+                    return new BigDecimal("99.99");
+                return super.createA(type);
+            }
+        };
+
+        Customer customer = new Faker<Customer>(Customer.class, factory) {
+            int age = 101;
+        }.get();
+        assertEquals(101, customer.age());
+        assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
+    }
+
+```
