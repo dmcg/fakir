@@ -4,7 +4,7 @@
 
     <groupId>com.oneeyedmen</groupId>
     <artifactId>fakir</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <name>TDB</name>
     <description>A reflective test data builder</description>
@@ -27,7 +27,7 @@
         <connection>scm:git:git@github.com:dmcg/fakir.git</connection>
         <developerConnection>scm:git:git@github.com:dmcg/fakir.git</developerConnection>
         <url>https://github.com/dmcg/tdb</url>
-        <tag>HEAD</tag>
+        <tag>fakir-1.0.1</tag>
     </scm>
 
     <properties>
@@ -135,9 +135,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <exec dir="${project.basedir}"
-                                      executable="./create_readme.sh"
-                                      failonerror="true">
+                                <exec dir="${project.basedir}" executable="./create_readme.sh" failonerror="true">
                                 </exec>
                             </tasks>
                         </configuration>
