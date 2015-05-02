@@ -170,7 +170,6 @@ public class ExampleTest {
             allowing(customers); will(ReturnAFakeAction.returnAFake());
         }});
 
-
         assertEquals("postcode", customers.find(99L).getAddress().getPostcode());
     }
 

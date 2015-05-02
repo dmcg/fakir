@@ -113,10 +113,8 @@
 
     @Test public void you_can_install_your_own_factory() {
         DefaultFactory factory = new DefaultFactory() {
-            public Object createA(Type type) {
-                if (type == BigDecimal.class)
-                    return new BigDecimal("99.99");
-                return super.createA(type);
+            protected BigDecimal createBigDecimal() {
+                return new BigDecimal("99.99");
             }
 
             protected List createList(Class<?> genericType) {
@@ -131,10 +129,8 @@
 
     @Test public void and_of_course_combine_that_with_overrides() {
         DefaultFactory factory = new DefaultFactory() {
-            public Object createA(Type type) {
-                if (type == BigDecimal.class)
-                    return new BigDecimal("99.99");
-                return super.createA(type);
+            protected BigDecimal createBigDecimal() {
+                return new BigDecimal("99.99");
             }
         };
 
@@ -143,6 +139,20 @@
         }.get();
         assertEquals(101, customer.age());
         assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
+    }
+
+    public interface CustomerService {
+        Customer find(Long id);
+    }
+
+    @Test public void and_as_we_lean_so_heavily_on_jmock_we_give_back_an_action() {
+        Mockery mockery = new Mockery();
+        final CustomerService customers = mockery.mock(CustomerService.class);
+        mockery.checking(new Expectations() {{
+            allowing(customers); will(ReturnAFakeAction.returnAFake());
+        }});
+
+        assertEquals("postcode", customers.find(99L).getAddress().getPostcode());
     }
 
 ```
