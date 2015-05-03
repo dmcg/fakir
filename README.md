@@ -44,6 +44,8 @@
         public Customer getCustomer() { return something(); }
         public Address getShippedTo() { return something(); }
         public BigDecimal getShippingCost() { return something(); }
+        public OrderStatus getStatus() { return something(); }
+        public void setStatus(OrderStatus status) {}
     }
 
     public static class OrderItem {
@@ -55,6 +57,10 @@
 
     public abstract class Product {
         public Product(Long id, String description, Object ... andSoOnAndSoOn) {}
+    }
+
+    public enum OrderStatus {
+        PLACED, PICKED, DISPATCHED, RECEIVED, RETURNED;
     }
 
     // To build a Customer, you need an Address, some Orders, some OrderItems, some Products...
@@ -78,7 +84,18 @@
         assertEquals(Long.valueOf(54), customer.id());
     }
 
-    @Test public void you_can_override_properties_with_fields() {
+    @Test public void enums_default_to_the_first() {
+        Order order = Faker.fakeA(Order.class);
+        assertEquals(OrderStatus.PLACED, order.getStatus());
+    }
+
+    @Test public void operations_are_ignored() {
+        Order order = Faker.fakeA(Order.class);
+        order.setStatus(OrderStatus.DISPATCHED);
+        assertEquals(OrderStatus.PLACED, order.getStatus());
+    }
+
+    @Test public void but_you_can_override_properties_with_fields() {
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
             int age = 24;
@@ -86,6 +103,16 @@
         assertEquals("fred", customer.getFirstName());
         assertEquals("lastName", customer.getLastName());
         assertEquals(24, customer.age());
+    }
+
+    @Test public void and_if_you_do_they_are_remembered() {
+        Order order = new Faker<Order>() {
+            OrderStatus status = OrderStatus.RECEIVED;
+        }.get();
+        assertEquals(OrderStatus.RECEIVED, order.getStatus());
+
+        order.setStatus(OrderStatus.RETURNED);
+        assertEquals(OrderStatus.RETURNED, order.getStatus());
     }
 
     @Test public void object_properties_are_faked_too() {

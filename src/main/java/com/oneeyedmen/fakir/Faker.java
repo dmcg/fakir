@@ -28,7 +28,7 @@ public class Faker<T> {
         return new Faker<T>(type, factory).get();
     }
 
-    protected Faker(Class<T> type, Factory factory) {
+    public Faker(Class<T> type, Factory factory) {
         this.factory = factory;
         //noinspection unchecked
         this.type = type != null ? type :

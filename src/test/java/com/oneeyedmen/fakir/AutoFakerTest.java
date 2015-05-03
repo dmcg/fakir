@@ -3,7 +3,6 @@ package com.oneeyedmen.fakir;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 @SuppressWarnings("UnusedDeclaration")
 public class AutoFakerTest {
@@ -28,22 +27,11 @@ public class AutoFakerTest {
         assertEquals('!', fake.aChar());
     }
 
-    @Test public void operations() {
-        try {
-            fake.operation();
-            fail();
-        } catch (NoSuchMethodError expected) {}
-        try {
-            fake.function(6);
-            fail();
-        } catch (NoSuchMethodError expected) {}
+    @Test public void ignores_parameters_for_functions() {
+        assertEquals(42, fake.function(6));
     }
 
-    @Test public void pathological() {
-        try {
-            fake.pathological();
-            fail();
-        } catch (IllegalArgumentException expected) {}
+    @Test public void ignores_operations() {
+        fake.operation();
     }
-
 }
