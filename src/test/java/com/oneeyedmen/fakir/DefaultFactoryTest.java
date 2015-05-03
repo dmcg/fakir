@@ -5,9 +5,9 @@ import org.junit.Test;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.*;
 
 @SuppressWarnings({"UnusedDeclaration", "unchecked"})
 public class DefaultFactoryTest {
@@ -40,6 +40,14 @@ public class DefaultFactoryTest {
 
     @Test public void returns_new_object_for_Object() {
         assertNotSame(factory.createA(Object.class), factory.createA(Object.class));
+    }
+
+    @Test public void returns_the_first_of_an_enum() {
+        assertEquals(TimeUnit.values()[0], factory.createA(TimeUnit.class));
+    }
+
+    @Test public void returns_null_for_Void() {
+        assertNull(factory.createA(Void.class));
     }
 
     @Test public void has_some_other_defaults() {
