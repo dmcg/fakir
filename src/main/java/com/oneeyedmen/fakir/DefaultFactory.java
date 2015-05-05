@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 public class DefaultFactory implements Factory {
     
@@ -43,6 +44,8 @@ public class DefaultFactory implements Factory {
             return createShort();
         if (List.class.isAssignableFrom(rawType))
             return createList(genericTypeFor(type));
+        if (Set.class.isAssignableFrom(rawType))
+            return createSet(genericTypeFor(type));
         if (BigDecimal.class.isAssignableFrom(rawType))
             return createBigDecimal();
         if (Enum.class.isAssignableFrom(rawType))
@@ -53,6 +56,7 @@ public class DefaultFactory implements Factory {
             return null;
         return Faker.fakeA(rawType, this);
     }
+
 
     private Enum createEnum(Class<?> type) {
         try {
@@ -106,9 +110,14 @@ public class DefaultFactory implements Factory {
         return DEFAULT_STRING;
     }
 
-    protected List createList(Class<?> genericType) {
-        return new FakeList(3, genericType, this);
+    protected <T> List<T> createList(Class<T> genericType) {
+        return new FakeList<T>(3, genericType, this);
     }
+
+    protected <T> Set<T> createSet(Class<T> genericType) {
+        return new FakeSet<T>(3, genericType, this);
+    }
+
 
     private Class<?> genericTypeFor(Type type) {
         if (type instanceof ParameterizedType)

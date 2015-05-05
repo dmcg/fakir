@@ -162,8 +162,8 @@ public class ExampleTest {
                 return new BigDecimal("99.99");
             }
 
-            protected List createList(Class<?> genericType) {
-                return new FakeList(1, genericType, this);
+            protected <T> List<T> createList(Class<T> genericType) {
+                return new FakeList<T>(1, genericType, this);
             }
         };
 

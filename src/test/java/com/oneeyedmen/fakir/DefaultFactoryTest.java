@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -15,6 +17,7 @@ public class DefaultFactoryTest {
     public abstract class AnotherClassToBeFaked {
         public abstract String thing();
         public abstract List<String> list();
+        public abstract Set<String> set();
     }
 
     private final Factory factory = DefaultFactory.INSTANCE;
@@ -65,6 +68,18 @@ public class DefaultFactoryTest {
         List<Object> list = (List<Object>) factory.createA(List.class);
         assertEquals(3, list.size());
         assertEquals(Object.class, list.get(0).getClass());
+    }
+
+    @Test public void creates_a_set_of_things_when_generic_type_info_info() throws NoSuchMethodException {
+        Type setOfStringType = AnotherClassToBeFaked.class.getDeclaredMethod("set").getGenericReturnType();
+        Set<String> set = (Set<String>) factory.createA(setOfStringType);
+        assertEquals(3, set.size());
+        // OK, this is a bit weird
+        Iterator<String> iterator = set.iterator();
+        assertEquals("banana", iterator.next());
+        assertEquals("banana", iterator.next());
+        assertEquals("banana", iterator.next());
+        assertFalse(iterator.hasNext());
     }
 
     @Test public void returns_another_fake_for_others() {
