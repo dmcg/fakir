@@ -60,7 +60,7 @@
     }
 
     public enum OrderStatus {
-        PLACED, PICKED, DISPATCHED, RECEIVED, RETURNED;
+        PLACED, PICKED, DISPATCHED, RECEIVED, RETURNED
     }
 
     // To build a Customer, you need an Address, some Orders, some OrderItems, some Products...
