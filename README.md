@@ -115,9 +115,13 @@
         assertEquals(OrderStatus.RETURNED, order.getStatus());
     }
 
-    @Test public void object_properties_are_faked_too() {
+    @Test public void object_properties_are_faked_recursively_and_cached() {
         Customer customer = Faker.fakeA(Customer.class);
-        assertEquals("postcode", customer.getAddress().getPostcode());
+        Address address = customer.getAddress();
+        assertEquals("postcode", address.getPostcode());
+
+        assertSame(address, customer.getAddress());
+        assertNotSame(address, Faker.fakeA(Customer.class).getAddress());
     }
 
     @Test public void lists_are_faked_with_3_entries() {
@@ -144,8 +148,8 @@
                 return new BigDecimal("99.99");
             }
 
-            protected List createList(Class<?> genericType) {
-                return new FakeList(1, genericType, this);
+            protected <T> List<T> createList(Class<T> genericType) {
+                return new FakeList<T>(1, genericType, this);
             }
         };
 
