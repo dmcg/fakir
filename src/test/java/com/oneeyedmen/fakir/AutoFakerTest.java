@@ -2,7 +2,7 @@ package com.oneeyedmen.fakir;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("UnusedDeclaration")
 public class AutoFakerTest {
@@ -14,7 +14,10 @@ public class AutoFakerTest {
         public abstract void operation();
         public abstract Void pathological();
         public abstract int function(int a);
+        public abstract CharSequence charSequence();
+        public abstract CharSequence charSequence(String s);
     }
+
 
     private final ClassToBeFaked fake = Faker.fakeA(ClassToBeFaked.class);
 
@@ -33,5 +36,23 @@ public class AutoFakerTest {
 
     @Test public void ignores_operations() {
         fake.operation();
+    }
+
+    @Test public void caches_results_by_invocation() {
+        assertSame(fake.charSequence(), fake.charSequence());
+        assertNotSame(fake.charSequence("fred"), fake.charSequence("bob"));
+    }
+
+    @Test public void caches_primitive_results_too() {
+        ClassToBeFaked fake = Faker.fakeA(ClassToBeFaked.class, new DefaultFactory() {
+            private int index;
+            @Override
+            protected Integer createInt() {
+                return index++;
+            }
+        });
+        assertEquals(0, fake.function(1));
+        assertEquals(1, fake.function(2));
+        assertEquals(0, fake.function(1));
     }
 }

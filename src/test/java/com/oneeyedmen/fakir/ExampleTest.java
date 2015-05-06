@@ -10,8 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @SuppressWarnings({"UnusedDeclaration", "ConstantConditions"})
 public class ExampleTest {
@@ -133,9 +132,13 @@ public class ExampleTest {
         assertEquals(OrderStatus.RETURNED, order.getStatus());
     }
 
-    @Test public void object_properties_are_faked_too() {
+    @Test public void object_properties_are_faked_recursively_and_cached() {
         Customer customer = Faker.fakeA(Customer.class);
-        assertEquals("postcode", customer.getAddress().getPostcode());
+        Address address = customer.getAddress();
+        assertEquals("postcode", address.getPostcode());
+
+        assertSame(address, customer.getAddress());
+        assertNotSame(address, Faker.fakeA(Customer.class).getAddress());
     }
 
     @Test public void lists_are_faked_with_3_entries() {

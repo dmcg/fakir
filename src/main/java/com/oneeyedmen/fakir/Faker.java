@@ -5,11 +5,14 @@ import com.oneeyedmen.fakir.internal.FakeAccess;
 import com.oneeyedmen.fakir.internal.FieldAccess;
 import com.oneeyedmen.fakir.internal.MethodAccess;
 import org.jmock.api.Imposteriser;
+import org.jmock.api.Invocation;
 import org.jmock.api.Invokable;
 import org.jmock.internal.ProxiedObjectIdentity;
 import org.jmock.lib.legacy.ClassImposteriser;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Faker<T> {
 
@@ -43,8 +46,10 @@ public class Faker<T> {
     public T get() {
         return IMPOSTERISER.imposterise(
                 new MyProxiedObjectIdentity(
-                        new MethodAccess(this,
-                                new FieldAccess(this, new FakeAccess(factory)))),
+                new MethodAccess(this,
+                new FieldAccess(this,
+                new Cacher(
+                new FakeAccess(factory))))),
                 type);
     }
 
@@ -62,4 +67,23 @@ public class Faker<T> {
         }
     }
 
+    private class Cacher implements Invokable {
+        private final Map<Invocation, Object> cache = new HashMap<Invocation, Object>();
+        private final Invokable next;
+
+        public Cacher(Invokable next) {
+            this.next = next;
+        }
+
+
+        @Override
+        public Object invoke(Invocation invocation) throws Throwable {
+            Object cached = cache.get(invocation);
+            if (cached != null)
+                return cached;
+            Object result = next.invoke(invocation);
+            cache.put(invocation, result);
+            return result;
+        }
+    }
 }
