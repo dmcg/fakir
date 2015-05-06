@@ -106,19 +106,19 @@ public class FakerTest {
     }
 
     @Test public void equals_only_considers_identity() {
-        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {}.get();
-        ClassToBeFaked fake2 = new Faker<ClassToBeFaked>() {}.get();
+        ClassToBeFaked fake = Faker.fakeA(ClassToBeFaked.class);
+        ClassToBeFaked fake2 = Faker.fakeA(ClassToBeFaked.class);
         assertEquals(fake, fake);
         assertNotEquals(fake, fake2);
     }
 
-    @Test public void to_string() {
-        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {}.get();
+    @Test public void returns_an_informative_to_string() {
+        ClassToBeFaked fake = Faker.fakeA(ClassToBeFaked.class);
         assertEquals("A fake ClassToBeFaked", fake.toString());
     }
 
     @Test public void fakes_accessors_by_name() {
-        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {}.get();
+        ClassToBeFaked fake = Faker.fakeA(ClassToBeFaked.class);
         assertEquals("name", fake.name());
     }
 
