@@ -200,6 +200,17 @@
         assertEquals("fred", customer.getFirstName());
     }
 
+    @Test public void this_can_be_extended_to_create_spies_on_existing_instances() {
+        // Feature for next release
+        // Customer existingCustomer = Faker.fakeA(Customer.class);
+        //
+        // Customer customer = Faker.spyOn(existingCustomer,
+        //     new Object() {
+        //         String firstName = "fred";
+        //     });
+        // assertEquals("fred", customer.getFirstName());
+    }
+
     public interface CustomerService {
         Customer find(Long id);
     }
