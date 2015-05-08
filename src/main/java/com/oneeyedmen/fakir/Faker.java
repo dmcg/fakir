@@ -42,23 +42,31 @@ public class Faker<T> {
         this(null, DefaultFactory.INSTANCE);
     }
 
-    @SuppressWarnings("unchecked")
-    public T get() {
-        return IMPOSTERISER.imposterise(
-                new MyProxiedObjectIdentity(
-                new MethodAccess(this,
-                new FieldAccess(this,
-                new Cacher(
-                new FakeAccess(factory))))),
-                type);
+    public static <T> T wrapWith(Class<T> type, Factory factory, Object delegate) {
+        MyProxiedObjectIdentity invokableChain = new MyProxiedObjectIdentity(type,
+                new MethodAccess(delegate,
+                        new FieldAccess(delegate, factory,
+                                new Cacher(
+                                        new FakeAccess(factory)))));
+        return IMPOSTERISER.imposterise(invokableChain, type);
     }
 
+    public static <T> T wrapWith(Class<T> type, Object delegate) {
+        return wrapWith(type, DefaultFactory.INSTANCE, delegate);
+    }
 
+    @SuppressWarnings("unchecked")
+    public T get() {
+        return wrapWith(type, factory, this);
+    }
 
+    private static class MyProxiedObjectIdentity extends ProxiedObjectIdentity {
 
-    private class MyProxiedObjectIdentity extends ProxiedObjectIdentity{
-        public MyProxiedObjectIdentity(Invokable next) {
+        private final Class<?> type;
+
+        public MyProxiedObjectIdentity(Class<?> type, Invokable next) {
             super(next);
+            this.type = type;
         }
 
         @Override
@@ -67,7 +75,7 @@ public class Faker<T> {
         }
     }
 
-    private class Cacher implements Invokable {
+    private static class Cacher implements Invokable {
         private final Map<Invocation, Object> cache = new HashMap<Invocation, Object>();
         private final Invokable next;
 

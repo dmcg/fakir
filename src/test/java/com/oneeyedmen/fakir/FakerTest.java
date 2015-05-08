@@ -73,6 +73,16 @@ public class FakerTest {
         assertEquals(true, fake.isSomething());
     }
 
+    @Test public void can_delegate_to_an_object() {
+        ClassToBeFaked fake = Faker.wrapWith(ClassToBeFaked.class, new Object() {
+            String property = "fred";
+        });
+
+        assertEquals("fred", fake.getProperty());
+        fake.setProperty("bill");
+        assertEquals("bill", fake.getProperty());
+    }
+
     @Test public void works_with_abstract_class() {
         abstract class AbstractValueToBeFaked {
             public abstract String getProperty();

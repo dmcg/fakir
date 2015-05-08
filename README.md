@@ -172,6 +172,34 @@
         assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
     }
 
+    @Test public void you_can_explicitly_return_fakes_from_fakes() {
+        Customer customer = new Faker<Customer>() {
+            Address address = new Faker<Address>() {
+                String line1 = "10 Downing St";
+            }.get();
+        }.get();
+        assertEquals("10 Downing St", customer.getAddress().getLine1());
+        assertEquals("postcode", customer.getAddress().getPostcode());
+    }
+
+    @Test public void and_if_you_do_you_can_use_the_fields_from_any_old_object() {
+        Customer customer = new Faker<Customer>() {
+            Object address = new Object() {
+                String line1 = "10 Downing St";
+            };
+        }.get();
+        assertEquals("10 Downing St", customer.getAddress().getLine1());
+        assertEquals("line2", customer.getAddress().getLine2());
+    }
+
+    @Test public void which_leads_to_another_way_of_overriding_at_the_top_level() {
+        Customer customer = Faker.wrapWith(Customer.class,
+            new Object() {
+                String firstName = "fred";
+        });
+        assertEquals("fred", customer.getFirstName());
+    }
+
     public interface CustomerService {
         Customer find(Long id);
     }
