@@ -20,8 +20,8 @@ public class ExampleTest {
     /*
      * Fakir - The Ascetic Wonder-Worker
      *
-     * Fake difficult to build objects, defaulting property values and
-     * allowing overrides.
+     * Fake difficult-to-build objects with default property values and
+     * custom overrides.
      */
 
     // We've all got classes like this, coupled for good reasons, really
