@@ -120,16 +120,11 @@
                 <version>2.5.2</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.2</version>
-            </plugin>
-            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>update-readme</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
