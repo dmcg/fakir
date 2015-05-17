@@ -6,7 +6,7 @@
     <artifactId>fakir</artifactId>
     <version>1.0.6-SNAPSHOT</version>
 
-    <name>TDB</name>
+    <name>Fakir</name>
     <description>A reflective test data builder</description>
     <url>http://github.com/dmcg/faqir</url>
     <licenses>
