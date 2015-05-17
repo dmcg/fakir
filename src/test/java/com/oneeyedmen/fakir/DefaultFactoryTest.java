@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 @SuppressWarnings({"UnusedDeclaration", "unchecked"})
 public class DefaultFactoryTest {
 
-    public abstract class AnotherClassToBeFaked {
+    public abstract class ClassToBeFaked {
         public abstract String thing();
         public abstract List<String> list();
         public abstract Set<String> set();
@@ -58,7 +58,7 @@ public class DefaultFactoryTest {
     }
 
     @Test public void creates_a_list_of_things_when_generic_type_info_info() throws NoSuchMethodException {
-        Type listOfStringType = AnotherClassToBeFaked.class.getDeclaredMethod("list").getGenericReturnType();
+        Type listOfStringType = ClassToBeFaked.class.getDeclaredMethod("list").getGenericReturnType();
         List<String> list = (List<String>) factory.createA(listOfStringType);
         assertEquals(3, list.size());
         assertEquals("banana", list.get(0));
@@ -71,7 +71,7 @@ public class DefaultFactoryTest {
     }
 
     @Test public void creates_a_set_of_things_when_generic_type_info_info() throws NoSuchMethodException {
-        Type setOfStringType = AnotherClassToBeFaked.class.getDeclaredMethod("set").getGenericReturnType();
+        Type setOfStringType = ClassToBeFaked.class.getDeclaredMethod("set").getGenericReturnType();
         Set<String> set = (Set<String>) factory.createA(setOfStringType);
         assertEquals(3, set.size());
         // OK, this is a bit weird
@@ -83,7 +83,31 @@ public class DefaultFactoryTest {
     }
 
     @Test public void returns_another_fake_for_others() {
-        assertEquals("thing", ((AnotherClassToBeFaked)factory.createA(AnotherClassToBeFaked.class)).thing());
+        assertEquals("thing", ((ClassToBeFaked)factory.createA(ClassToBeFaked.class)).thing());
+    }
+
+    @Test public void allows_override_by_class() {
+        DefaultFactory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
+                new Faker<ClassToBeFaked>() {
+                    String thing = "bob";
+                }.get());
+        assertEquals("bob", ((ClassToBeFaked) factory.createA((Type) ClassToBeFaked.class)).thing());
+    }
+
+    @Test public void allows_override_by_class_with_a_faker() {
+        DefaultFactory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
+                new Faker<ClassToBeFaked>() {
+                    String thing = "bob";
+                });
+        assertEquals("bob", ((ClassToBeFaked) factory.createA((Type) ClassToBeFaked.class)).thing());
+    }
+
+    @Test public void allows_override_by_class_with_an_object() {
+        DefaultFactory factory = new DefaultFactory().withOverrideObject(ClassToBeFaked.class,
+                new Object() {
+                    String thing = "bob";
+                });
+        assertEquals("bob", ((ClassToBeFaked) factory.createA((Type) ClassToBeFaked.class)).thing());
     }
 
 }

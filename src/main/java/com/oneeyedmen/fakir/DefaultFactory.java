@@ -3,7 +3,9 @@ package com.oneeyedmen.fakir;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultFactory implements Factory {
@@ -21,8 +23,13 @@ public class DefaultFactory implements Factory {
     public static final String DEFAULT_STRING = "banana";
     public static final BigDecimal DEFAULT_BIG_DECIMAL = BigDecimal.valueOf(6.02214129e23);
 
+    private final Map<Type, ObjectSupplier> overrides = new HashMap<Type, ObjectSupplier>();
+
     @Override
     public Object createA(Type type) {
+        ObjectSupplier overrideOrNull = overrideOrNullFor(type);
+        if (overrideOrNull != null)
+            return overrideOrNull.get();
         Class<?> rawType = type instanceof ParameterizedType ? (Class)((ParameterizedType) type).getRawType() : (Class) type;
         if (rawType == String.class)
             return createString();
@@ -37,7 +44,7 @@ public class DefaultFactory implements Factory {
         if (rawType == Double.TYPE || rawType == Double.class)
             return createDouble();
         if (rawType == Character.TYPE || rawType == Character.class)
-            return createChat();
+            return createChar();
         if (rawType == Byte.TYPE || rawType == Byte.class)
             return createByte();
         if (rawType == Short.TYPE || rawType == Short.class)
@@ -47,6 +54,10 @@ public class DefaultFactory implements Factory {
         if (Set.class.isAssignableFrom(rawType))
             return createSet(genericTypeFor(type));
         return createA(rawType);
+    }
+
+    private ObjectSupplier overrideOrNullFor(Type type) {
+        return overrides.get(type);
     }
 
     protected <T> Object createA(Class<T> type) {
@@ -85,7 +96,7 @@ public class DefaultFactory implements Factory {
         return DEFAULT_BYTE;
     }
 
-    protected Character createChat() {
+    protected Character createChar() {
         return DEFAULT_CHAR;
     }
 
@@ -132,4 +143,47 @@ public class DefaultFactory implements Factory {
         return (Class<?>) type.getActualTypeArguments()[0];
     }
 
+    public <T> DefaultFactory withOverride(Class<T> type, T value) {
+        overrides.put(type, new FixedValueObjectSupplier<T>(value));
+        return this;
+    }
+
+    public <T> DefaultFactory withOverride(Class<T> type, Faker<T> faker) {
+        overrides.put(type, new FakerObjectSupplier<T>(faker));
+        return this;
+    }
+
+    public <T> DefaultFactory withOverrideObject(Class<T> type, Object supplier) {
+        return withOverride(type, Faker.wrapWith(type, supplier));
+    }
+
+    public interface ObjectSupplier<T> {
+        public T get();
+    }
+
+    private class FixedValueObjectSupplier<T> implements ObjectSupplier<T> {
+        private final T value;
+
+        public FixedValueObjectSupplier(T value) {
+            this.value = value;
+        }
+
+        @Override
+        public T get() {
+            return value;
+        }
+    }
+
+    private class FakerObjectSupplier<T> implements ObjectSupplier<T> {
+        private final Faker<T> faker;
+
+        public FakerObjectSupplier(Faker<T> faker) {
+            this.faker = faker;
+        }
+
+        @Override
+        public T get() {
+            return faker.get();
+        }
+    }
 }
