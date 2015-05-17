@@ -46,17 +46,20 @@ public class DefaultFactory implements Factory {
             return createList(genericTypeFor(type));
         if (Set.class.isAssignableFrom(rawType))
             return createSet(genericTypeFor(type));
-        if (BigDecimal.class.isAssignableFrom(rawType))
-            return createBigDecimal();
-        if (Enum.class.isAssignableFrom(rawType))
-            return createEnum(rawType);
-        if (rawType == Object.class)
-            return createObject();
-        if (rawType == Void.class)
-            return null;
-        return Faker.fakeA(rawType, this);
+        return createA(rawType);
     }
 
+    protected <T> Object createA(Class<T> type) {
+        if (BigDecimal.class.isAssignableFrom(type))
+            return createBigDecimal();
+        if (Enum.class.isAssignableFrom(type))
+            return createEnum(type);
+        if (type == Object.class)
+            return createObject();
+        if (type == Void.class)
+            return null;
+        return Faker.fakeA(type, this);
+    }
 
     private Enum createEnum(Class<?> type) {
         try {
