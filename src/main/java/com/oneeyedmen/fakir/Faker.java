@@ -14,7 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Faker<T> {
+public class Faker<T> implements Supplier<T>{
 
     private static final Imposteriser IMPOSTERISER = ClassImposteriser.INSTANCE;
 

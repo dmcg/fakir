@@ -23,11 +23,11 @@ public class DefaultFactory implements Factory {
     public static final String DEFAULT_STRING = "banana";
     public static final BigDecimal DEFAULT_BIG_DECIMAL = BigDecimal.valueOf(6.02214129e23);
 
-    private final Map<Type, ObjectSupplier> overrides = new HashMap<Type, ObjectSupplier>();
+    private final Map<Type, Supplier<?>> overrides = new HashMap<Type, Supplier<?>>();
 
     @Override
     public Object createA(Type type) {
-        ObjectSupplier overrideOrNull = overrideOrNullFor(type);
+        Supplier<?> overrideOrNull = overrideOrNullFor(type);
         if (overrideOrNull != null)
             return overrideOrNull.get();
         Class<?> rawType = type instanceof ParameterizedType ? (Class)((ParameterizedType) type).getRawType() : (Class) type;
@@ -56,7 +56,7 @@ public class DefaultFactory implements Factory {
         return createA(rawType);
     }
 
-    private ObjectSupplier overrideOrNullFor(Type type) {
+    private Supplier<?> overrideOrNullFor(Type type) {
         return overrides.get(type);
     }
 
@@ -132,7 +132,6 @@ public class DefaultFactory implements Factory {
         return new FakeSet<T>(3, genericType, this);
     }
 
-
     private Class<?> genericTypeFor(Type type) {
         if (type instanceof ParameterizedType)
             return firstGenericParameterOf((ParameterizedType) type);
@@ -149,19 +148,15 @@ public class DefaultFactory implements Factory {
     }
 
     public <T> DefaultFactory withOverride(Class<T> type, Faker<T> faker) {
-        overrides.put(type, new FakerObjectSupplier<T>(faker));
+        overrides.put(type, faker);
         return this;
     }
 
     public <T> DefaultFactory withOverrideObject(Class<T> type, Object supplier) {
-        return withOverride(type, Faker.wrapWith(type, supplier));
+        return withOverride(type, Faker.wrapWith(type, this, supplier));
     }
 
-    public interface ObjectSupplier<T> {
-        public T get();
-    }
-
-    private class FixedValueObjectSupplier<T> implements ObjectSupplier<T> {
+    private class FixedValueObjectSupplier<T> implements Supplier<T> {
         private final T value;
 
         public FixedValueObjectSupplier(T value) {
@@ -171,19 +166,6 @@ public class DefaultFactory implements Factory {
         @Override
         public T get() {
             return value;
-        }
-    }
-
-    private class FakerObjectSupplier<T> implements ObjectSupplier<T> {
-        private final Faker<T> faker;
-
-        public FakerObjectSupplier(Faker<T> faker) {
-            this.faker = faker;
-        }
-
-        @Override
-        public T get() {
-            return faker.get();
         }
     }
 }
