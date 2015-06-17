@@ -143,4 +143,14 @@ public class FakerTest {
         } catch (ClassCastException x) {
         }
     }
+
+    @Test public void can_override_toString() {
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            public String toString() {
+                return "Overriden name";
+            }
+        }.get();
+
+        assertEquals("Overriden name", fake.toString());
+    }
 }

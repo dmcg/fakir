@@ -43,8 +43,8 @@ public class Faker<T> implements Supplier<T>{
     }
 
     public static <T> T wrapWith(Class<T> type, Factory factory, Object delegate) {
-        MyProxiedObjectIdentity invokableChain = new MyProxiedObjectIdentity(type,
-                new MethodAccess(delegate,
+        Invokable invokableChain = new MethodAccess(delegate,
+                new MyProxiedObjectIdentity(type,
                         new FieldAccess(delegate, factory,
                                 new Cacher(
                                         new FakeAccess(factory)))));
