@@ -150,7 +150,43 @@ public class FakerTest {
                 return "Overriden name";
             }
         }.get();
-
         assertEquals("Overriden name", fake.toString());
     }
+
+    @Test public void suppliers_will_be_called() {
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            Supplier<String> name = new Supplier<String>() {
+                @Override
+                public String get() {
+                    return "fred";
+                }
+            };
+            Supplier<Boolean> something = new Supplier<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return true;
+                }
+            };
+        }.get();
+        assertEquals("fred", fake.name());
+        assertEquals(true, fake.isSomething());
+    }
+
+    @Test public void throws_ClassCastException_on_supplier_of_wrong_type() {
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            Supplier<Integer> name = new Supplier<Integer>() {
+                @Override
+                public Integer get() {
+                    return 42;
+                }
+            };
+        }.get();
+
+        try {
+            fake.name();
+            fail();
+        } catch (ClassCastException x) {
+        }
+    }
+
 }

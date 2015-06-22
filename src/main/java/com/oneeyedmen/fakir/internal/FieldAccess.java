@@ -2,6 +2,7 @@ package com.oneeyedmen.fakir.internal;
 
 import com.oneeyedmen.fakir.Factory;
 import com.oneeyedmen.fakir.Faker;
+import com.oneeyedmen.fakir.Supplier;
 import org.jmock.api.Invocation;
 import org.jmock.api.Invokable;
 
@@ -9,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 
 public class FieldAccess implements Invokable {
 
@@ -45,10 +48,16 @@ public class FieldAccess implements Invokable {
         Class<?> rawType = type instanceof ParameterizedType ? (Class)((ParameterizedType) type).getRawType() : (Class) type;
         if (canReturnAs(rawType, o))
             return o;
+        for (Object optional : gotFromSupplier(rawType, o)) {
+            return optional;
+        };
+        for (Object optional : gotFromJava8Supplier(rawType, o)) {
+            return optional;
+        };
         try {
             return Faker.wrapWith(rawType, factory, o);
         } catch (Exception fallback) {
-            throw new ClassCastException("Faker couldn't construct a " + type.getTypeName() + " for " + fieldName);
+            throw new ClassCastException("Faker couldn't construct a " + type + " for " + fieldName);
         }
     }
 
@@ -99,5 +108,30 @@ public class FieldAccess implements Invokable {
 
     private static String removePrefixAnduncapitalise(String methodName, int index) {
         return Character.toLowerCase(methodName.charAt(index)) + methodName.substring(index + 1);
+    }
+
+    private List gotFromSupplier(Class<?> typeToReturn, Object o) {
+        if (o instanceof Supplier<?>) {
+            Object supplied = ((Supplier) o).get();
+            if (canReturnAs(typeToReturn, supplied)) {
+                return Collections.singletonList(supplied);
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List gotFromJava8Supplier(Class<?> typeToReturn, Object o) {
+        try {
+            Class java8Supplier = Class.forName("java.util.function.Supplier");
+            if (java8Supplier.isAssignableFrom(o.getClass())) {
+                Object supplied = java8Supplier.getDeclaredMethod("get").invoke(o);
+                if (canReturnAs(typeToReturn, supplied))
+                    return Collections.singletonList(supplied);
+            }
+        } catch (Exception x) {
+
+        }
+        return Collections.EMPTY_LIST;
     }
 }
