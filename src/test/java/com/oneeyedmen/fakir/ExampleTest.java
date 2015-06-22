@@ -106,13 +106,7 @@ public class ExampleTest {
         assertEquals(OrderStatus.PLACED, order.getStatus());
     }
 
-    @Test public void operations_are_ignored() {
-        Order order = Faker.fakeA(Order.class);
-        order.setStatus(OrderStatus.DISPATCHED);
-        assertEquals(OrderStatus.PLACED, order.getStatus());
-    }
-
-    @Test public void but_you_can_override_properties_with_fields() {
+    @Test public void you_can_override_properties_with_fields() {
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
             int age = 24;
@@ -122,7 +116,25 @@ public class ExampleTest {
         assertEquals(24, customer.age());
     }
 
-    @Test public void and_if_you_do_they_are_remembered() {
+    @Test public void and_fake_operations_with_methods() {
+        Customer customer = new Faker<Customer>() {
+            void printOn(PrintStream s) {
+                s.println("kumquat");
+            }
+        }.get();
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        customer.printOn(new PrintStream(os));
+        assertEquals("kumquat\n", os.toString());
+    }
+
+    @Test public void operations_are_ignored_unless_overridden() {
+        Order order = Faker.fakeA(Order.class);
+        order.setStatus(OrderStatus.DISPATCHED);
+        assertEquals(OrderStatus.PLACED, order.getStatus());
+    }
+
+    @Test public void but_you_can_back_properties_with_fields() {
         Order order = new Faker<Order>() {
             OrderStatus status = OrderStatus.RECEIVED;
         }.get();
@@ -145,18 +157,6 @@ public class ExampleTest {
         Customer customer = Faker.fakeA(Customer.class);
         assertEquals(3, customer.getOrders().size());
         assertEquals("line1", customer.getOrders().get(1).getShippedTo().getLine1());
-    }
-
-    @Test public void you_can_fake_operations_with_methods() {
-        Customer customer = new Faker<Customer>() {
-            void printOn(PrintStream s) {
-                s.println("kumquat");
-            }
-        }.get();
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        customer.printOn(new PrintStream(os));
-        assertEquals("kumquat\n", os.toString());
     }
 
     @Test public void you_can_install_your_own_factory() {
