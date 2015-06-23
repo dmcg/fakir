@@ -1,11 +1,12 @@
-```java
 
-    /*
-     * Fakir - The Ascetic Wonder-Worker
-     *
-     * Fake difficult-to-build objects with default property values and
-     * custom overrides.
-     */
+Fakir - The Ascetic Wonder-Worker
+=================================
+
+Fake difficult-to-build objects with default property values and custom overrides.
+
+[ExampleTest](src/test/java/com/oneeyedmen/okeydoke/examples/ApprovalsRuleTest.java)
+
+```java
 
     // We've all got classes like this, coupled for good reasons, really
     // hard to build.
@@ -18,10 +19,11 @@
         public Long id() { return something(); }
         public String getFirstName() { return something(); }
         public String getLastName() { return something(); }
-        public int age() { return something(); }
+        public int rank() { return something(); }
         public Address getAddress() { return something(); }
         public List<Order> getOrders() { return something(); }
         public void printOn(PrintStream s) { s.println("Hello"); }
+        public Customer getAffiliate() { return something(); }
     }
 
     public static class Address {
@@ -80,7 +82,7 @@
 
     @Test public void primitive_properties_have_defaults_too() {
         Customer customer = Faker.fakeA(Customer.class);
-        assertEquals(42, customer.age());
+        assertEquals(42, customer.rank());
         assertEquals(Long.valueOf(54), customer.id());
     }
 
@@ -89,23 +91,35 @@
         assertEquals(OrderStatus.PLACED, order.getStatus());
     }
 
-    @Test public void operations_are_ignored() {
+    @Test public void you_can_override_properties_with_fields() {
+        Customer customer = new Faker<Customer>() {
+            String firstName = "fred";
+            int rank = 24;
+        }.get();
+        assertEquals("fred", customer.getFirstName());
+        assertEquals("lastName", customer.getLastName());
+        assertEquals(24, customer.rank());
+    }
+
+    @Test public void and_fake_operations_with_methods() {
+        Customer customer = new Faker<Customer>() {
+            void printOn(PrintStream s) {
+                s.println("kumquat");
+            }
+        }.get();
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        customer.printOn(new PrintStream(os));
+        assertEquals("kumquat\n", os.toString());
+    }
+
+    @Test public void operations_are_ignored_unless_overridden() {
         Order order = Faker.fakeA(Order.class);
         order.setStatus(OrderStatus.DISPATCHED);
         assertEquals(OrderStatus.PLACED, order.getStatus());
     }
 
-    @Test public void but_you_can_override_properties_with_fields() {
-        Customer customer = new Faker<Customer>() {
-            String firstName = "fred";
-            int age = 24;
-        }.get();
-        assertEquals("fred", customer.getFirstName());
-        assertEquals("lastName", customer.getLastName());
-        assertEquals(24, customer.age());
-    }
-
-    @Test public void and_if_you_do_they_are_remembered() {
+    @Test public void but_you_can_back_properties_with_fields() {
         Order order = new Faker<Order>() {
             OrderStatus status = OrderStatus.RECEIVED;
         }.get();
@@ -128,18 +142,6 @@
         Customer customer = Faker.fakeA(Customer.class);
         assertEquals(3, customer.getOrders().size());
         assertEquals("line1", customer.getOrders().get(1).getShippedTo().getLine1());
-    }
-
-    @Test public void you_can_fake_operations_with_methods() {
-        Customer customer = new Faker<Customer>() {
-            void printOn(PrintStream s) {
-                s.println("kumquat");
-            }
-        }.get();
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        customer.printOn(new PrintStream(os));
-        assertEquals("kumquat\n", os.toString());
     }
 
     @Test public void you_can_install_your_own_factory() {
@@ -166,9 +168,9 @@
         };
 
         Customer customer = new Faker<Customer>(Customer.class, factory) {
-            int age = 101;
+            int rank = 101;
         }.get();
-        assertEquals(101, customer.age());
+        assertEquals(101, customer.rank());
         assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
     }
 
@@ -223,6 +225,67 @@
         }});
 
         assertEquals("postcode", customers.find(99L).getAddress().getPostcode());
+    }
+
+```
+
+Fakir builds and runs under JDK6, but now has some Java8'y goodness [Java8ExampleTest](java8/src/test/java/com/oneeyedmen/fakir/java8/Java8ExampleTest.java)
+for easy testing of legacy code.
+
+```java
+
+    @Test public void faker_will_delegate_to_suppliers() {
+        Customer customer = new Faker<Customer>() {
+            Supplier<Long> id = () -> Math.round(Long.MAX_VALUE * Math.random());
+        }.get();
+        assertNotEquals(customer.id(), customer.id());
+    }
+
+    @Test public void which_can_solve_some_circular_dependency_issues() {
+        List<Customer> customers = new ArrayList<>(2);
+        Object[] customerData = {
+            new Object() {
+                String lastName = "Flintstone";
+                Supplier<Customer> affiliate = () -> customers.get(1);
+            },
+            new Object() {
+                Supplier<String> lastName = () -> customers.get(0).getLastName();
+            }
+        };
+        stream(customerData).map(data -> Faker.wrapWith(Customer.class, data)).forEach(customers::add);
+
+        assertEquals("Flintstone", customers.get(0).getLastName());
+        assertEquals("Flintstone", customers.get(1).getLastName());
+        assertEquals(customers.get(1), customers.get(0).getAffiliate());
+        assertEquals(customers.get(1), customers.get(0).getAffiliate());
+    }
+
+    @Test
+    public void you_cant_cast_a_faker_to_a_Java8_supplier() {
+        try {
+            Faker<Customer> faker = new Faker<Customer>() {
+                String firstName = "Fred";
+            };
+            Supplier<Customer> java8Supplier = (Supplier<Customer>) faker;
+            fail("A shame, but nevermind");
+        } catch (ClassCastException ignored) {
+        }
+    }
+
+    @Test public void but_you_can_finesse_it() {
+        Supplier<Customer> java8Supplier = new Faker<Customer>() {
+            String firstName = "Fred";
+        }::get;
+    }
+
+    @Test public void and_use_that_to_generalise() {
+        Supplier<Customer> java8Supplier = asSupplier(new Faker<Customer>() {
+            String firstName = "Fred";
+        });
+    }
+
+    private <T> Supplier<T> asSupplier(com.oneeyedmen.fakir.Supplier<T> faker) {
+        return faker::get;
     }
 
 ```

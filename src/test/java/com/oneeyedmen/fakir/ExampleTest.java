@@ -17,13 +17,6 @@ public class ExampleTest {
 
 // README_TEXT
 
-    /*
-     * Fakir - The Ascetic Wonder-Worker
-     *
-     * Fake difficult-to-build objects with default property values and
-     * custom overrides.
-     */
-
     // We've all got classes like this, coupled for good reasons, really
     // hard to build.
 
@@ -35,10 +28,11 @@ public class ExampleTest {
         public Long id() { return something(); }
         public String getFirstName() { return something(); }
         public String getLastName() { return something(); }
-        public int age() { return something(); }
+        public int rank() { return something(); }
         public Address getAddress() { return something(); }
         public List<Order> getOrders() { return something(); }
         public void printOn(PrintStream s) { s.println("Hello"); }
+        public Customer getAffiliate() { return something(); }
     }
 
     public static class Address {
@@ -97,7 +91,7 @@ public class ExampleTest {
 
     @Test public void primitive_properties_have_defaults_too() {
         Customer customer = Faker.fakeA(Customer.class);
-        assertEquals(42, customer.age());
+        assertEquals(42, customer.rank());
         assertEquals(Long.valueOf(54), customer.id());
     }
 
@@ -109,11 +103,11 @@ public class ExampleTest {
     @Test public void you_can_override_properties_with_fields() {
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
-            int age = 24;
+            int rank = 24;
         }.get();
         assertEquals("fred", customer.getFirstName());
         assertEquals("lastName", customer.getLastName());
-        assertEquals(24, customer.age());
+        assertEquals(24, customer.rank());
     }
 
     @Test public void and_fake_operations_with_methods() {
@@ -183,9 +177,9 @@ public class ExampleTest {
         };
 
         Customer customer = new Faker<Customer>(Customer.class, factory) {
-            int age = 101;
+            int rank = 101;
         }.get();
-        assertEquals(101, customer.age());
+        assertEquals(101, customer.rank());
         assertEquals(BigDecimal.valueOf(99.99), customer.getOrders().get(0).getShippingCost());
     }
 
