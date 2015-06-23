@@ -229,7 +229,7 @@ Fake difficult-to-build objects with default property values and custom override
 
 ```
 
-Fakir builds and runs under JDK6, but now has some Java8'y goodness [Java8ExampleTest](java8/src/test/java/com/oneeyedmen/fakir/java8/Java8ExampleTest.java)
+Fakir builds and runs under JDK6, but now has some [Java8'y goodness](java8/src/test/java/com/oneeyedmen/fakir/java8/Java8ExampleTest.java)
 for easy testing of legacy code.
 
 ```java
@@ -238,7 +238,7 @@ for easy testing of legacy code.
         Customer customer = new Faker<Customer>() {
             Supplier<Long> id = () -> Math.round(Long.MAX_VALUE * Math.random());
         }.get();
-        assertNotEquals(customer.id(), customer.id());
+        assertNotEquals("OK, it's contrived, but you get the point", customer.id(), customer.id());
     }
 
     @Test public void which_can_solve_some_circular_dependency_issues() {
