@@ -82,6 +82,24 @@ public class DefaultFactoryTest {
         assertFalse(iterator.hasNext());
     }
 
+    @Test public void creates_an_array_of_object() {
+        ClassToBeFaked[] array = (ClassToBeFaked[]) factory.createA(ClassToBeFaked[].class);
+        assertEquals(3, array.length);
+        assertEquals("thing", array[0].thing());
+    }
+
+    @Test public void creates_an_array_of_string() {
+        String[] array = (String[]) factory.createA(String[].class);
+        assertEquals(3, array.length);
+        assertEquals("banana", array[0]);
+    }
+
+    @Test public void creates_an_array_of_primitive() {
+        int[] array = (int[]) factory.createA(int[].class);
+        assertEquals(3, array.length);
+        assertEquals(42, array[0]);
+    }
+
     @Test public void returns_another_fake_for_others() {
         assertEquals("thing", ((ClassToBeFaked)factory.createA(ClassToBeFaked.class)).thing());
     }

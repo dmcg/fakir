@@ -1,5 +1,6 @@
 package com.oneeyedmen.fakir;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -11,6 +12,8 @@ import java.util.Set;
 public class DefaultFactory implements Factory {
     
     public static final Factory INSTANCE = new DefaultFactory();
+
+    public static final int DEFAULT_COLLECTION_SIZE = 3;
 
     public static final Boolean DEFAULT_BOOLEAN = Boolean.FALSE;
     public static final Byte DEFAULT_BYTE = (byte) 0x07;
@@ -49,11 +52,31 @@ public class DefaultFactory implements Factory {
             return createByte();
         if (rawType == Short.TYPE || rawType == Short.class)
             return createShort();
+        if (rawType.isArray())
+            return createArray(rawType);
         if (List.class.isAssignableFrom(rawType))
             return createList(genericTypeFor(type));
         if (Set.class.isAssignableFrom(rawType))
             return createSet(genericTypeFor(type));
         return createA(rawType);
+    }
+
+    private <T> Object createArray(Class<T> rawType) {
+        Class<?> componentType = rawType.getComponentType();
+        return componentType.isPrimitive() ? createPrimitiveArray(componentType) : createReferenceArray(componentType);
+    }
+
+    protected Object createReferenceArray(Class<?> componentType) {
+        List<?> list = createList(componentType);
+        return list.toArray((Object[]) Array.newInstance(componentType, list.size()));
+    }
+
+    protected <T> Object createPrimitiveArray(Class<T> componentType) {
+        Object result = Array.newInstance(componentType, DEFAULT_COLLECTION_SIZE);
+        for (int i = 0; i < DEFAULT_COLLECTION_SIZE; i++) {
+            Array.set(result, i, createA((Type) componentType));
+        }
+        return result;
     }
 
     private Supplier<?> overrideOrNullFor(Type type) {
@@ -125,11 +148,11 @@ public class DefaultFactory implements Factory {
     }
 
     protected <T> List<T> createList(Class<T> genericType) {
-        return new FakeList<T>(3, genericType, this);
+        return new FakeList<T>(DEFAULT_COLLECTION_SIZE, genericType, this);
     }
 
     protected <T> Set<T> createSet(Class<T> genericType) {
-        return new FakeSet<T>(3, genericType, this);
+        return new FakeSet<T>(DEFAULT_COLLECTION_SIZE, genericType, this);
     }
 
     private Class<?> genericTypeFor(Type type) {
