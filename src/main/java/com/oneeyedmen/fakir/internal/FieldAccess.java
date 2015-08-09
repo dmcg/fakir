@@ -10,8 +10,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 
 public class FieldAccess implements Invokable {
 
@@ -29,19 +31,60 @@ public class FieldAccess implements Invokable {
     public Object invoke(Invocation invocation) throws Throwable {
         Method method = invocation.getInvokedMethod();
         try {
-            if (method.getParameterTypes().length == 0) {
-                Field field = object.getClass().getDeclaredField(fieldNameForAccessor(method));
-                field.setAccessible(true);
-                return returnValueFor(field.get(object), method.getGenericReturnType(), method.getName());
-            } else {
-                Field field = object.getClass().getDeclaredField(fieldNameForMutator(method));
-                field.setAccessible(true);
-                field.set(object, invocation.getParametersAsArray()[0]);
-                return null;
+            if (invocation.getParameterCount() == 0) {
+                return getScalarProperty(method);
+            } else if (invocation.getParameterCount() == 1) {
+                if (method.getReturnType() == void.class) {
+                    return setScalarProperty(method, invocation.getParameter(0));
+                } else {
+                    for (Object optional : getKeyedProperty(method, invocation.getParameter(0))) {
+                        return optional;
+                    }
+                }
+            } else if (invocation.getParameterCount() == 2) {
+                return setKeyedProperty(method, invocation.getParameter(0), invocation.getParameter(1));
             }
+
         } catch (NoSuchFieldException e) {
-            return next.invoke(invocation);
+            // ignored
         }
+        return next.invoke(invocation);
+    }
+
+    private Object getScalarProperty(Method method) throws NoSuchFieldException, IllegalAccessException {
+        Field field = object.getClass().getDeclaredField(fieldNameForAccessor(method));
+        field.setAccessible(true);
+        return returnValueFor(field.get(object), method.getGenericReturnType(), method.getName());
+    }
+
+    private Object setScalarProperty(Method method, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field field = object.getClass().getDeclaredField(fieldNameForMutator(method));
+        field.setAccessible(true);
+        field.set(object, value);
+        return null;
+    }
+
+    private Iterable<Object> getKeyedProperty(Method method, Object key) throws NoSuchFieldException, IllegalAccessException {
+        Map<?, ?> map = mapForKeyedProperty(fieldNameForAccessor(method));
+        if (map.containsKey(key)) {
+            return singleton(returnValueFor(map.get(key), method.getGenericReturnType(), method.getName()));
+        }
+        else {
+            return emptyList();
+        }
+    }
+
+    private Object setKeyedProperty(Method method, Object key, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Map map = mapForKeyedProperty(fieldNameForMutator(method));
+        //noinspection unchecked
+        map.put(key, value);
+        return null;
+    }
+
+    private Map mapForKeyedProperty(String name) throws NoSuchFieldException, IllegalAccessException {
+        Field field = object.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return (Map) field.get(object);
     }
 
     private Object returnValueFor(Object o, Type type, String fieldName) {
@@ -98,40 +141,45 @@ public class FieldAccess implements Invokable {
     static String fieldNameForAccessor(Method method) {
         String methodName = method.getName();
         if (methodName.startsWith("get")) {
-            return removePrefixAnduncapitalise(methodName, 3);
+            return removePrefixAndUncapitalise(methodName, 3);
         }
-        else if (methodName.startsWith("is"))
-            return removePrefixAnduncapitalise(methodName, 2);
-        else
+        else if (methodName.startsWith("is")) {
+            return removePrefixAndUncapitalise(methodName, 2);
+        }
+        else {
             return methodName;
+        }
     }
 
-    private static String removePrefixAnduncapitalise(String methodName, int index) {
+    private static String removePrefixAndUncapitalise(String methodName, int index) {
         return Character.toLowerCase(methodName.charAt(index)) + methodName.substring(index + 1);
     }
 
-    private List gotFromSupplier(Class<?> typeToReturn, Object o) {
+    private Iterable<Object> gotFromSupplier(Class<?> typeToReturn, Object o) {
         if (o instanceof Supplier<?>) {
             Object supplied = ((Supplier) o).get();
             if (canReturnAs(typeToReturn, supplied)) {
-                return Collections.singletonList(supplied);
+                return singleton(supplied);
             }
         }
-        return Collections.EMPTY_LIST;
+
+        return emptyList();
     }
 
     @SuppressWarnings("unchecked")
-    private List gotFromJava8Supplier(Class<?> typeToReturn, Object o) {
+    private Iterable<Object> gotFromJava8Supplier(Class<?> typeToReturn, Object o) {
         try {
             Class java8Supplier = Class.forName("java.util.function.Supplier");
             if (java8Supplier.isAssignableFrom(o.getClass())) {
                 Object supplied = java8Supplier.getDeclaredMethod("get").invoke(o);
-                if (canReturnAs(typeToReturn, supplied))
-                    return Collections.singletonList(supplied);
+                if (canReturnAs(typeToReturn, supplied)) {
+                    return singleton(supplied);
+                }
             }
         } catch (Exception x) {
-
+            // ignored
         }
-        return Collections.EMPTY_LIST;
+
+        return emptyList();
     }
 }

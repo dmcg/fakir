@@ -2,6 +2,9 @@ package com.oneeyedmen.fakir;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 @SuppressWarnings("UnusedDeclaration")
@@ -31,6 +34,9 @@ public class FakerTest {
         public void setSomething(boolean value) {
             isSomething = value;
         }
+
+        public int getKeyedProperty(String key) { return -1; };
+        public void setKeyedProperty(String key, int newValue) {} ;
     }
 
     @Test public void use_a_field_to_fake_an_accessor() {
@@ -189,4 +195,56 @@ public class FakerTest {
         }
     }
 
+    @Test
+    public void looks_up_keyed_property_in_map() {
+        final Map<String,Integer> m = new HashMap<String, Integer>();
+        m.put("x", 10);
+        m.put("y", 20);
+
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            Map<String,Integer> keyedProperty = m;
+        }.get();
+
+        assertEquals(10, fake.getKeyedProperty("x"));
+        assertEquals(20, fake.getKeyedProperty("y"));
+    }
+
+    @Test
+    public void returns_default_value_for_keyed_property_when_key_not_in_map() {
+        final Map<String,Integer> m = new HashMap<String, Integer>();
+
+        Factory factory = new DefaultFactory();
+
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>(ClassToBeFaked.class, factory) {
+            Map<String,Integer> keyedProperty = m;
+        }.get();
+
+        //noinspection AssertEqualsBetweenInconvertibleTypes
+        assertEquals(factory.createA(Integer.class), fake.getKeyedProperty("x"));
+    }
+
+    @Test
+    public void can_get_and_set_mutable_keyed_property_via_map() {
+        final Map<String,Integer> m = new HashMap<String, Integer>();
+        m.put("x", 10);
+
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            Map<String,Integer> keyedProperty = m;
+        }.get();
+
+        fake.setKeyedProperty("x", 99);
+        assertEquals(99, fake.getKeyedProperty("x"));
+    }
+
+    @Test
+    public void can_set_mutable_keyed_property_that_was_not_given_initial_value() {
+        final Map<String,Integer> m = new HashMap<String, Integer>();
+
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            Map<String,Integer> keyedProperty = m;
+        }.get();
+
+        fake.setKeyedProperty("x", 99);
+        assertEquals(99, fake.getKeyedProperty("x"));
+    }
 }
