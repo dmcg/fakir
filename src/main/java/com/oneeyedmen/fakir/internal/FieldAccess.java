@@ -98,15 +98,15 @@ public class FieldAccess implements Invokable {
     static String fieldNameForAccessor(Method method) {
         String methodName = method.getName();
         if (methodName.startsWith("get")) {
-            return removePrefixAnduncapitalise(methodName, 3);
+            return removePrefixAndUncapitalise(methodName, 3);
         }
         else if (methodName.startsWith("is"))
-            return removePrefixAnduncapitalise(methodName, 2);
+            return removePrefixAndUncapitalise(methodName, 2);
         else
             return methodName;
     }
 
-    private static String removePrefixAnduncapitalise(String methodName, int index) {
+    private static String removePrefixAndUncapitalise(String methodName, int index) {
         return Character.toLowerCase(methodName.charAt(index)) + methodName.substring(index + 1);
     }
 
