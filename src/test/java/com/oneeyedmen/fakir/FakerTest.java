@@ -132,16 +132,13 @@ public class FakerTest {
         assertEquals("name", fake.name());
     }
 
-    @Test public void throws_ClassCastException_on_wrong_type() {
+    @Test(expected = ClassCastException.class)
+    public void throws_ClassCastException_on_wrong_type() {
         ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
             int name = 42;
         }.get();
 
-        try {
-            fake.name();
-            fail();
-        } catch (ClassCastException x) {
-        }
+        fake.name();
     }
 
     @Test public void can_override_toString() {
@@ -187,6 +184,16 @@ public class FakerTest {
             fail();
         } catch (ClassCastException x) {
         }
+    }
+
+    interface GenericInterface<T> {
+        public abstract T getProperty();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void cantFakeGenericThings() {
+        GenericInterface<String> fake = new Faker<GenericInterface<String>>(){}.get();
+        assertEquals("banana", fake.getProperty());
     }
 
 }

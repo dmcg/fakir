@@ -11,6 +11,7 @@ import org.jmock.internal.ProxiedObjectIdentity;
 import org.jmock.lib.legacy.ClassImposteriser;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +34,10 @@ public class Faker<T> implements Supplier<T>{
 
     public Faker(Class<T> type, Factory factory) {
         this.factory = factory;
-        //noinspection unchecked
-        this.type = type != null ? type :
-                (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        this.type = type != null ? type : guessMyType();
     }
 
+    // constructor called when we subclass Faker
     protected Faker() {
         this(null, DefaultFactory.INSTANCE);
     }
@@ -92,6 +92,17 @@ public class Faker<T> implements Supplier<T>{
             Object result = next.invoke(invocation);
             cache.put(invocation, result);
             return result;
+        }
+    }
+
+    private Class<T> guessMyType() {
+        ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+        Type type = genericSuperclass.getActualTypeArguments()[0];
+        if (type instanceof Class<?>) {
+            //noinspection unchecked
+            return (Class<T>) type;
+        } else {
+            throw new UnsupportedOperationException("Sorry, Fakir doesn't fake generic types");
         }
     }
 }
