@@ -10,7 +10,7 @@ public class FakeSetTest {
         public int value = 0;
     }
 
-    private final FakeSet<TestItem> set = new FakeSet<TestItem>(2, TestItem.class, DefaultFactory.INSTANCE);
+    private final FakeSet<TestItem> set = new FakeSet<TestItem>(2, TestItem.class, Faker.DEFAULT_FACTORY);
 
     @Test
     public void it_has_as_many_elements_as_its_size() {
@@ -29,7 +29,7 @@ public class FakeSetTest {
     public void it_acts_like_a_set() {
         TestItem item0 = set.iterator().next();
         assertTrue(set.contains(item0));
-        assertFalse(set.contains(DefaultFactory.INSTANCE.createA(TestItem.class)));
+        assertFalse(set.contains(Faker.DEFAULT_FACTORY.createA(TestItem.class)));
     }
 
     @Test(expected = UnsupportedOperationException.class)

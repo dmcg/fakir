@@ -18,6 +18,12 @@ import java.util.Map;
 public class Faker<T> implements Supplier<T>{
 
     private static final Imposteriser IMPOSTERISER = ClassImposteriser.INSTANCE;
+    static final Factory DEFAULT_FACTORY = new DefaultFactory() {
+        @Override
+        protected <T> T lastResort(Class<T> type) {
+            return fakeA(type, this);
+        }
+    };
 
     @SuppressWarnings("unchecked")
     private final Class<T> type;
@@ -25,7 +31,7 @@ public class Faker<T> implements Supplier<T>{
 
 
     public static <T> T fakeA(Class<T> type) {
-        return fakeA(type, DefaultFactory.INSTANCE);
+        return fakeA(type, DEFAULT_FACTORY);
     }
 
     public static <T> T fakeA(Class<T> type, Factory factory) {
@@ -39,7 +45,7 @@ public class Faker<T> implements Supplier<T>{
 
     // constructor called when we subclass Faker
     protected Faker() {
-        this(null, DefaultFactory.INSTANCE);
+        this(null, DEFAULT_FACTORY);
     }
 
     public static <T> T wrapWith(Class<T> type, Factory factory, Object delegate) {
@@ -52,7 +58,7 @@ public class Faker<T> implements Supplier<T>{
     }
 
     public static <T> T wrapWith(Class<T> type, Object delegate) {
-        return wrapWith(type, DefaultFactory.INSTANCE, delegate);
+        return wrapWith(type, DEFAULT_FACTORY, delegate);
     }
 
     @SuppressWarnings("unchecked")

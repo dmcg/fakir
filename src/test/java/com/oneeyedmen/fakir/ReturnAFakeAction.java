@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 
 public class ReturnAFakeAction implements Action {
 
-    private static final Action INSTANCE = returnAFakeFrom(DefaultFactory.INSTANCE);
+    private static final Action INSTANCE = returnAFakeFrom(Faker.DEFAULT_FACTORY);
 
     private final Factory factory;
     private final Type type;
@@ -26,7 +26,7 @@ public class ReturnAFakeAction implements Action {
     }
 
     public ReturnAFakeAction(Type type) {
-        this(type, DefaultFactory.INSTANCE);
+        this(type, Faker.DEFAULT_FACTORY);
     }
 
     private ReturnAFakeAction(Type type, Factory factory) {

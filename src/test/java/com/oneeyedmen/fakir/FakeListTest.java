@@ -12,7 +12,7 @@ public class FakeListTest {
         public int value = 0;
     }
 
-    private final FakeList<TestItem> list = new FakeList<TestItem>(2, TestItem.class, DefaultFactory.INSTANCE);
+    private final FakeList<TestItem> list = new FakeList<TestItem>(2, TestItem.class, Faker.DEFAULT_FACTORY);
 
     @Test
     public void it_has_as_many_elements_as_its_size() {

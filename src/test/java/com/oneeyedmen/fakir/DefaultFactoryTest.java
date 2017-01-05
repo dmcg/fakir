@@ -20,7 +20,7 @@ public class DefaultFactoryTest {
         public abstract Set<String> set();
     }
 
-    private final Factory factory = DefaultFactory.INSTANCE;
+    private final Factory factory = Faker.DEFAULT_FACTORY;
 
     @Test public void returns_defaults_for_primitives() {
         assertEquals(false, factory.createA(Boolean.TYPE));
@@ -104,7 +104,7 @@ public class DefaultFactoryTest {
     }
 
     @Test public void allows_override_by_class() {
-        DefaultFactory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
+        Factory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
                 new Faker<ClassToBeFaked>() {
                     String thing = "bob";
                 }.get());
@@ -112,7 +112,7 @@ public class DefaultFactoryTest {
     }
 
     @Test public void allows_override_by_class_with_a_faker() {
-        DefaultFactory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
+        Factory factory = new DefaultFactory().withOverride(ClassToBeFaked.class,
                 new Faker<ClassToBeFaked>() {
                     String thing = "bob";
                 });
@@ -120,7 +120,7 @@ public class DefaultFactoryTest {
     }
 
     @Test public void allows_override_by_class_with_an_object() {
-        DefaultFactory factory = new DefaultFactory().withOverrideObject(ClassToBeFaked.class,
+        Factory factory = new DefaultFactory().withOverrideObject(ClassToBeFaked.class,
                 new Object() {
                     String thing = "bob";
                 });
