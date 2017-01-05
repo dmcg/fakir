@@ -8,7 +8,7 @@
 
     <name>Fakir</name>
     <description>A reflective test data builder</description>
-    <url>http://github.com/dmcg/faqir</url>
+    <url>http://github.com/dmcg/fakir</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
