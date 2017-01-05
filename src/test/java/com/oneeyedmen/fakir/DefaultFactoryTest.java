@@ -57,26 +57,25 @@ public class DefaultFactoryTest {
         assertEquals(BigDecimal.valueOf(6.02214129e23), factory.createA(BigDecimal.class));
     }
 
-    @Test public void creates_a_list_of_things_when_generic_type_info_info() throws NoSuchMethodException {
+    @Test public void creates_a_list_of_things_when_generic_type_info_available() throws NoSuchMethodException {
         Type listOfStringType = ClassToBeFaked.class.getDeclaredMethod("list").getGenericReturnType();
         List<String> list = (List<String>) factory.createA(listOfStringType);
-        assertEquals(3, list.size());
+        assertEquals(DefaultFactory.DEFAULT_COLLECTION_SIZE, list.size());
         assertEquals("banana", list.get(0));
     }
 
-    @Test public void creates_a_list_of_object_when_no_generic_type_info() {
+    @Test public void creates_a_list_of_object_when_no_generic_type_info_available() {
         List<Object> list = (List<Object>) factory.createA(List.class);
-        assertEquals(3, list.size());
+        assertEquals(2, list.size());
         assertEquals(Object.class, list.get(0).getClass());
     }
 
-    @Test public void creates_a_set_of_things_when_generic_type_info_info() throws NoSuchMethodException {
+    @Test public void creates_a_set_of_things_when_generic_type_info_available() throws NoSuchMethodException {
         Type setOfStringType = ClassToBeFaked.class.getDeclaredMethod("set").getGenericReturnType();
         Set<String> set = (Set<String>) factory.createA(setOfStringType);
-        assertEquals(3, set.size());
+        assertEquals(2, set.size());
         // OK, this is a bit weird
         Iterator<String> iterator = set.iterator();
-        assertEquals("banana", iterator.next());
         assertEquals("banana", iterator.next());
         assertEquals("banana", iterator.next());
         assertFalse(iterator.hasNext());
@@ -84,19 +83,19 @@ public class DefaultFactoryTest {
 
     @Test public void creates_an_array_of_object() {
         ClassToBeFaked[] array = (ClassToBeFaked[]) factory.createA(ClassToBeFaked[].class);
-        assertEquals(3, array.length);
+        assertEquals(2, array.length);
         assertEquals("thing", array[0].thing());
     }
 
     @Test public void creates_an_array_of_string() {
         String[] array = (String[]) factory.createA(String[].class);
-        assertEquals(3, array.length);
+        assertEquals(2, array.length);
         assertEquals("banana", array[0]);
     }
 
     @Test public void creates_an_array_of_primitive() {
         int[] array = (int[]) factory.createA(int[].class);
-        assertEquals(3, array.length);
+        assertEquals(2, array.length);
         assertEquals(42, array[0]);
     }
 

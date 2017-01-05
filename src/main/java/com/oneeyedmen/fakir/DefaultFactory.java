@@ -13,7 +13,7 @@ public class DefaultFactory implements Factory {
     
     public static final Factory INSTANCE = new DefaultFactory();
 
-    public static final int DEFAULT_COLLECTION_SIZE = 3;
+    public static final int DEFAULT_COLLECTION_SIZE = 2;
 
     public static final Boolean DEFAULT_BOOLEAN = Boolean.FALSE;
     public static final Byte DEFAULT_BYTE = (byte) 0x07;
