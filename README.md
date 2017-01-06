@@ -138,9 +138,9 @@ Fake difficult-to-build objects with default property values and custom override
         assertNotSame(address, Faker.fakeA(Customer.class).getAddress());
     }
 
-    @Test public void lists_are_faked_with_3_entries() {
+    @Test public void lists_are_faked_with_2_entries() {
         Customer customer = Faker.fakeA(Customer.class);
-        assertEquals(3, customer.getOrders().size());
+        assertEquals(2, customer.getOrders().size());
         assertEquals("line1", customer.getOrders().get(1).getShippedTo().getLine1());
     }
 
