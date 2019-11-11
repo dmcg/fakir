@@ -104,10 +104,12 @@ public class ExampleTest {
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
             int rank = 24;
+            Customer affiliate = null;
         }.get();
         assertEquals("fred", customer.getFirstName());
         assertEquals("lastName", customer.getLastName());
         assertEquals(24, customer.rank());
+        assertNull(customer.getAffiliate());
     }
 
     @Test public void and_fake_operations_with_methods() {

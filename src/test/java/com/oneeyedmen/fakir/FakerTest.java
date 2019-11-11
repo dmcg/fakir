@@ -62,6 +62,17 @@ public class FakerTest {
         assertEquals("fred", fake.getProperty());
     }
 
+    @Test public void use_a_null_field_to_fake_a_property() {
+        ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
+            String property = null;
+        }.get();
+
+        assertEquals(null, fake.getProperty());
+
+        fake.setProperty("fred");
+        assertEquals("fred", fake.getProperty());
+    }
+
     @Test public void use_a_field_to_fake_an_is_property() {
         ClassToBeFaked fake = new Faker<ClassToBeFaked>() {
             boolean something = false;

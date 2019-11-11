@@ -62,7 +62,7 @@ public class FieldAccess implements Invokable {
     }
 
     private boolean canReturnAs(Class<?> rawType, Object o) {
-        return rawType.isInstance(o) || isBoxedInstanceOf(rawType, o);
+        return o == null || rawType.isInstance(o) || isBoxedInstanceOf(rawType, o);
     }
 
     private boolean isBoxedInstanceOf(Class<?> rawType, Object o) {
