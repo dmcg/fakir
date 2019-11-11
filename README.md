@@ -4,7 +4,7 @@ Fakir - The Ascetic Wonder-Worker
 
 Fake difficult-to-build objects with default property values and custom overrides.
 
-[ExampleTest](src/test/java/com/oneeyedmen/okeydoke/examples/ApprovalsRuleTest.java)
+[ExampleTest](src/test/java/com/oneeyedmen/fakir/ExampleTest.java)
 
 ```java
 
@@ -95,10 +95,12 @@ Fake difficult-to-build objects with default property values and custom override
         Customer customer = new Faker<Customer>() {
             String firstName = "fred";
             int rank = 24;
+            Customer affiliate = null;
         }.get();
         assertEquals("fred", customer.getFirstName());
         assertEquals("lastName", customer.getLastName());
         assertEquals(24, customer.rank());
+        assertNull(customer.getAffiliate());
     }
 
     @Test public void and_fake_operations_with_methods() {

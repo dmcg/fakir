@@ -13,7 +13,7 @@ Fakir - The Ascetic Wonder-Worker
 
 Fake difficult-to-build objects with default property values and custom overrides.
 
-[ExampleTest](src/test/java/com/oneeyedmen/okeydoke/examples/ApprovalsRuleTest.java)
+[ExampleTest](src/test/java/com/oneeyedmen/fakir/ExampleTest.java)
 "  > README.md
 
 write_file_contents src/test/java/com/oneeyedmen/fakir/ExampleTest.java >> README.md
